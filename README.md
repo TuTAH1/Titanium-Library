@@ -12,7 +12,7 @@ Basic functions, mostly types/classes/convertions related
 
 ## Titanium Console [Titanium.Console]
 [low development activity]
-Add convinient and beautiful way to display menus, progressbars and other things in the console. Get a very customizable, easy and beautiful way to get data from user
+Adds convinient and beautiful way to display menus, progressbars and other things in the console. Get a very customizable, easy and beautiful way to get data from user
 
 ## Titanium Forms [Titanium.Forms]
 [low development activity]
