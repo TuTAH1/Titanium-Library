@@ -364,3 +364,6 @@ FodyWeavers.xsd
 
 # secret files
 secret/
+
+# personal link
+__Goto_Js.lnk
