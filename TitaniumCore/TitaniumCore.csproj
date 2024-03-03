@@ -1,9 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <PackageId>Titanium.Basics.Core</PackageId>
+    <Title>Titanium Library</Title>
+    <Authors>Титан</Authors>
+    <Description>Just extending basic C# things, "QoL improvements" for c# programming. Mostly classes and types methods.</Description>
+    <Copyright>CC BY-NC 4.0</Copyright>
+    <PackageProjectUrl>https://github.com/TuTAH1/Titanium-Library</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/TuTAH1/Titanium-Library</RepositoryUrl>
+    <PackageTags>better c#, types, string, types extensions methods, basic</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>

@@ -33,7 +33,7 @@ namespace DoNotUse
 namespace Titanium {
 	/// <summary>
 	/// Just my library of small functions that makes c# programming easier. Written from when I write "Hello Wrold" first time, so some code may be shitty, uncommented, buggy or not optimal.
-	/// <para /> <see langword="WARNING"/>! It is NOT backward compatible, so don't update it after you started using it in your project. Some function may be deleted, reworked (parametr removal, renaming or even just order changing; behaviour changing) even if there's no serious need for it. There's no "that strange shitty костыльный spaghetti code is here because of historical reasons, for compatibility purposes" and never will be. If function become obsolete, it's usually gets immidiatly mercilessly removed. If I see that some change will make function more convinient, but change its behaviour I'll always do it – don't expect that after update all function will work the same even if there's no syntax errors. Never update without reading changelog.
+	/// <para /> <see langword="WARNING"/>! It is NOT backward compatible, so don't update it after you started using it in your project. Some function may be deleted, reworked (parametr removal, renaming or even just order changing; behaviour changing) even if there's no serious need for it. There's no "that strange shitty костыльный spaghetti code is here because of historical reasons, for compatibility purposes" and never will be. If function become obsolete, it's usually gets immidiatly mercilessly removed. If I see that some change will make function more convinient, but change its behaviour I'll always do it – don't expect that after update all functions will work the same even if there's no syntax errors. Never update without reading changelog.
 	/// <para /> This is comment to the namespace comment btw, becouse I can't make xml comment to the namespace
 	/// <para> Despite of the other code license, THIS file is <see href="https://creativecommons.org/licenses/by-sa/4.0">CC BY-SA</see></para>
 	/// <list type="table">
@@ -1044,7 +1044,11 @@ namespace Titanium {
 				int start = 0; //: slice cursor start position
 				int end = int.MaxValue; //: slice cursor end position
 				bool basicSlice = Start is int or null && End is int or null; //: detects if input is basic slice (start and end are ints)
-				if (basicSlice) return s.Substring(Start?? 0, ((End?? s.Length) - (Start?? 0)))
+				if (basicSlice)
+				{
+					start = 
+					return s.Substring((Start?? 0), ((End?? s.Length) - (Start?? 0)))
+				}
 
 				switch (Start)
 				{
@@ -1975,13 +1979,13 @@ namespace Titanium {
 	public static class IO
 	{
 		/// <summary>
-		/// Copies all files, directories, subdirectories and it's contant to the new folder
+		/// Copies all files, directories, subdirectories and it's content to the new folder
 		/// </summary>
 		/// <param name="SourcePath"></param>
 		/// <param name="TargetPath"></param>
 		/// <param name="KillRelatedProcesses"></param>
 		/// <param name="DisableSyntaxCheck">All paths should end on "\" and contains only "\" (not "/)</param>
-		public static void CopyAll(string SourcePath, string TargetPath, bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false)
+		public static void CopyAll(string SourcePath, string TargetPath, bool KillRelatedProcesses = false, List<Regex>? ExceptList = null, bool DisableSyntaxCheck = false)
 		{
 			ExceptList ??= new List<Regex>();
 			var ErrorList = new List<Exception>();
@@ -2026,7 +2030,13 @@ namespace Titanium {
 
 			if (ErrorList.Count > 0) throw new AggregateException("Unable to copy files" ,ErrorList);
 		}
-
+		/// <summary>
+		/// Removes all files and directories in the folder
+		/// </summary>
+		/// <param name="FolderPath"></param>
+		/// <param name="RemoveSelf"></param>
+		/// <param name="ExceptList"></param>
+		/// <exception cref="AggregateException"></exception>
 		public static void RemoveAll(string FolderPath, bool RemoveSelf = true, List<Regex>? ExceptList = null)
 		{
 			var ErrorList = new List<Exception>();
@@ -2082,7 +2092,8 @@ namespace Titanium {
 			CopyAll(di.FullName, TargetPath, KillRelatedProcesses, ExceptList, DisableSyntaxCheck);
 		}
 
-		public static void MoveAllTo(string SourcePath, string TargetPath, bool DeleteSourceDir = true,  bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false) => new DirectoryInfo(SourcePath).MoveAllTo(TargetPath, DeleteSourceDir, KillRelatedProcesses, ExceptList, DisableSyntaxCheck);
+		public static void MoveAllTo(string SourcePath, string TargetPath, bool DeleteSourceDir = true,  bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false) 
+			=> new DirectoryInfo(SourcePath).MoveAllTo(TargetPath, DeleteSourceDir, KillRelatedProcesses, ExceptList, DisableSyntaxCheck);
 
 		public static void MoveAllTo(this DirectoryInfo di, string TargetPath, bool DeleteSourceDir = true, bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false)
 		{
