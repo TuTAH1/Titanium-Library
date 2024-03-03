@@ -1,4 +1,4 @@
-Readme's and repository is currently WIP
+Readmes and repository is currently WIP
 
 "Better C#" or, to put it more accurately, a more convenient C# – my library of small functions that makes c# programming easier. Written from when I write "Hello Wrold" first time, so some code may be shitty, uncommented, buggy or not optimal.
 There are simple, but often used methods that everybody writes from scratch and include in their personal libraries like this. But why would you invent another wheel if Titanium library exist, the big collection of detailed and very functional "wheel" functions?
