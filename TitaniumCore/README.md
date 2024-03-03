@@ -5,8 +5,8 @@ Code for Copilot:
 
 Legend:
 <details>
-<summary>whatTypeExtending.FunctionName(mandatory, parameters, optional_parametrs_count) → return_type_if_not_obvious
-<br>&ensp;↳ whatTypeExtending.ChildMethod(mandatory, optional_count) → returns</summary>
+<summary><a name="example">whatTypeExtending.FunctionName(mandatory, parameters, optional_parametrs_count) → return_type_if_not_obvious
+<br>&ensp;↳ whatTypeExtending.ChildMethod(mandatory, optional_count) → returns</a></summary>
 Parameters:
 
 ```cs
@@ -36,7 +36,7 @@ Here are the functions for parsing types to other types.
 Checks if types are satisfy some conditions
 
 <details>
-<summary>char.IsDigit()</summary>
+<summary><a name="isdigit">char.IsDigit()</a></summary>
 Checks if the char is a digit
 </details>
 
@@ -146,3 +146,5 @@ bool string.IsNullOrEmpty()
 bool string.IsNullOrWhiteSpace()
 string string.IsInterned()
 ```
+
+[test](#example)
