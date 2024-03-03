@@ -1,4 +1,7 @@
-"Better C#" or, to put it more accurately, a more convenient C#. There are simple, but often used methods that everybody writes from scratch and include in their personal libraries like this. But why would you invent another wheel if Titanium library exist, the big collection of detailed and very functional "wheel" functions?
+"Better C#" or, to put it more accurately, a more convenient C# – my library of small functions that makes c# programming easier. Written from when I write "Hello Wrold" first time, so some code may be shitty, uncommented, buggy or not optimal.
+There are simple, but often used methods that everybody writes from scratch and include in their personal libraries like this. But why would you invent another wheel if Titanium library exist, the big collection of detailed and very functional "wheel" functions?
+
+**WARNING!** It is NOT backward compatible, so don't update it after you started using it in your project. Some function may be deleted, reworked (parametr removal, renaming or even just order changing; behaviour changing) even if there's no serious need for it. There's no "that strange shitty костыльный spaghetti code is here because of historical reasons, for compatibility purposes" and never will be. If function become obsolete, it's usually gets immidiatly mercilessly removed. If I see that some change will make function more convinient, but change its behaviour I'll always do it – don't expect that after update all functions will work the same even if there's no syntax errors. Never update without reading changelog. That's just personal library I decided to publish after all.
 
 Readme's and repository is currently WIP
 
