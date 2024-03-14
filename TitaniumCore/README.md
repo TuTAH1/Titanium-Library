@@ -1016,3 +1016,5 @@ bool string.IsNullOrEmpty()
 bool string.IsNullOrWhiteSpace()
 string string.IsInterned()
 ```
+
+[test](#example)
