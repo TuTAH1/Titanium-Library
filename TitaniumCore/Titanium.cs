@@ -487,71 +487,70 @@ namespace Titanium {
 				#region Bool
 
 
+				/// <summary>
+				/// Converts string to bool. If it's "yes" in any language, "1" or "true" returns true. Optimized version
+				/// </summary>
+				/// <param name="S"></param>
+				/// <returns>True, if string is "yes" in any language</returns>
 				public static bool ToBool(this string S)
 				{
 					return S.ToLower() is "1" or "true" or "yes" or "да" or "是" or "si" or "sì" or "da" or "sim" or "ja" or "ya";
 				}
 
+				/// <summary>
+				/// Converts string to bool. If it's "yes" in any language, "1" or "true" returns true. Unoptimized, but better readable version
+				/// </summary>
+				/// <param name="S"></param>
+				/// <returns>True, if string is "yes" in any language</returns>
+
 				public static bool YesToBool(this string S)
 				{
 					return new[]
 					{
-						"1", "true",
-						"是", // chinese (simplified)
-						"yes", // english
-						"sí", // spanish
-						"sim", // portuguese
-						"ya", // indonesian
-						"हाँ", // hindi
-						"نعم", // arabic
-						"да", // russian
-						"はい", // japanese
-						"ja", // german
-						"oui", // french
-						"sì", // italian
-						"evet", // turkish
-						"ใช่", // thai
-						"네", // korean
-						"tak", // polish
-						"ja", // dutch
-						"igen", // hungarian
-						"ja", // swedish
-						"ano", // czech
-						"vâng", // vietnamese
-						"ναι", // greek
-						"כן", // hebrew
-						"da", // romanian
-						"так", // ukrainian
-						"да", // bulgarian
-						"kyllä", // finnish
-						"ja", // norwegian
-						"ja", // danish
-						"áno", // slovak
-						"taip", // lithuanian
-						"da", // croatian
-						"да", // serbian
-						"jah", // estonian
-						"jā", // latvian
-						"da", // slovenian
-						"sí", // catalan
-						"bəli", // azerbaijani
-						"დიახ", // georgian
-						"da", // serbian (latin)
-						"так", // belarusian
-						"да", // macedonian
-						"иә", // kazakh
-						"ஆம்", // tamil
-						"bəli", // azerbaijani (cyrillic)
-						"ਹਾਂ", // punjabi
+						"1", // true (English)
+						"是", // Chinese (Simplified)
+						"sí", // Spanish
+						"sim", // Portuguese
+						"ya", // Indonesian
+						"हाँ", // Hindi
+						"نعم", // Arabic
+						"да", // Russian, Bulgarian
+						"はい", // Japanese
+						"ja", // German, Dutch, Swedish, Norwegian, Danish
+						"oui", // French
+						"sì", // Italian
+						"evet", // Turkish
+						"ใช่", // Thai
+						"네", // Korean
+						"tak", // Polish
+						"так", // Ukrainian
+						"igen", // Hungarian
+						"ano", // Czech
+						"vâng", // Vietnamese
+						"ναι", // Greek
+						"כן", // Hebrew
+						"kyllä", // Finnish
+						"áno", // Slovak
+						"taip", // Lithuanian
+						"da", // Croatian, Slovenian
+						"jah", // Estonian
+						"jā", // Latvian
+						"sí", // Catalan
+						"bəli", // Azerbaijani
+						"დიახ", // Georgian
+						"иә", // Kazakh
+						"ஆம்", // Tamil
+						"ਹਾਂ", // Punjabi
 					}.ContainsAny(S.ToLower());
 				}
 
+				//TODO: Add other languages; Refactor to use ToBool(this string S, CultureInfo lang)
 				public static string ToRuString(this bool Bool)
 				{
 					return Bool? "Да" : "Нет";
 				}
 
-				public static bool RandBool(int TrueProbability) {
+				public static bool RandBool(Int32 TrueProbability = Int32.MaxValue/2) {
 					Random rand = new Random((int)DateTime.Now.Ticks);
 					return rand.Next() <= TrueProbability;
 				}
@@ -712,23 +711,7 @@ namespace Titanium {
 
 			#region String
 
-			public static bool ContainsAny(this string s, IEnumerable<string> sequence) => sequence.Any(s.Contains); 
-			public static bool ContainsAny(this string s, params string[] sequence) => sequence.Any(s.Contains); //: 24.10.2022 IEnumerable replaced with params
-			public static bool ContainsAll(this string s, IEnumerable<string> sequence) => sequence.All(s.Contains);//: 24.10.2022 IEnumerable replaced with params
-
-			public static bool ContainsAll(this string s, params string[] sequence) => sequence.All(s.Contains);//: 24.10.2022 IEnumerable replaced with params
-
-			public static int SymbolsCount(this string s)
-			{
-				int i = s.Length;
-				foreach (var c in s)
-				{
-					if (char.IsControl(c)) i--;
-				}
-
-				return i;
-			}
-
+			
 			#region SplitN
 
 				/// <summary>
@@ -868,47 +851,73 @@ namespace Titanium {
 
 				#endregion
 
-			public static string FormatToString(this double d, int n, Positon pos, char filler = ' ') //:Ленивый и неоптимизированный способ
+
+			public static bool ContainsAny(this string s, IEnumerable<string> sequence) => sequence.Any(s.Contains); 
+			public static bool ContainsAny(this string s, params string[] sequence) => sequence.Any(s.Contains); //: 24.10.2022 IEnumerable replaced with params
+			public static bool ContainsAll(this string s, IEnumerable<string> sequence) => sequence.All(s.Contains);//: 24.10.2022 IEnumerable replaced with params
+
+			public static bool ContainsAll(this string s, params string[] sequence) => sequence.All(s.Contains);//: 24.10.2022 IEnumerable replaced with params
+
+			public static int SymbolsCount(this string s)
 			{
-				d = Math.Round(d, n);
+				int i = s.Length;
+				foreach (var c in s)
+				{
+					if (char.IsControl(c)) i--;
+				}
+
+				return i;
+			}
+
+			/// <summary>
+			/// Makes s.Length be equal to <paramref name="FixedLength"/> by adding <paramref name="Filler"/> symbols if it's too short or cutting it if it's too long
+			/// </summary>
+			/// <param name="d"></param>
+			/// <param name="FixedLength"></param>
+			/// <param name="Align"></param>
+			/// <param name="Filler"></param>
+			/// <returns></returns>
+			public static string FormatToString(this double d, int FixedLength, Positon Align, char Filler = ' ') //:Ленивый и неоптимизированный способ
+			{
+				d = Math.Round(d, FixedLength);
 				string s = d.ToString();
-				if (s.Length < n) {
-					switch (pos) {
+				if (s.Length < FixedLength) {
+					switch (Align) {
 					case Positon.left: {
-						for (int i = s.Length; i < n; i++)
+						for (int i = s.Length; i < FixedLength; i++)
 						{
-							s += filler;
+							s += Filler;
 						}
 					} break;
 					case Positon.center: {
-						int halfString = (n - s.Length) / 2;
+						int halfString = (FixedLength - s.Length) / 2;
 						for (int i = 0; i < halfString; i++)
 						{
-							s=s.Insert(0, filler.ToString());
+							s=s.Insert(0, Filler.ToString());
 						}
-						for (int i = s.Length; i < n; i++)
+						for (int i = s.Length; i < FixedLength; i++)
 						{
-							s += filler;
+							s += Filler;
 						}
 					}break;
 					case Positon.right: {
-						for (int i = 0; i < (n - s.Length); i++)
+						for (int i = 0; i < (FixedLength - s.Length); i++)
 						{
-							s = s.Insert(0, filler.ToString());
+							s = s.Insert(0, Filler.ToString());
 						}
 					}break;
 					}
 				}
-				else if (s.Length > n) {
+				else if (s.Length > FixedLength) {
 					int Eindex = s.LastIndexOf('e');
 
 					if (Eindex > 0) { //если в строке есть Е+хх
 						string e = s.TrimStart('e');
-						s = s.Substring(0, n - e.Length);
+						s = s.Substring(0, FixedLength - e.Length);
 						s += e;
 					}
 					else {
-						s = s.Substring(0, n);
+						s = s.Substring(0, FixedLength);
 					}
 				}
 				return s;
@@ -1036,7 +1045,9 @@ namespace Titanium {
 			///  <exception cref="TypeInitializationException">Type of Start or End is not supported by slice. Ignores <paramref name="throwException"/> value</exception>
 			///  <exception cref="ArgumentNullException">If input is null or empty</exception>
 			///  <exception cref="ArgumentOutOfRangeException">Start or end not found</exception>
-			///  <returns>string between <paramref name="Start"/> and <paramref name="End"/></returns>
+			///  <returns>string between <paramref name="Start"/> and <paramref name="End"/>
+			///  null if <paramref name="throwException"/> is <see langword="false"/> and start or end not found
+			/// </returns>
 			public static string? Slice<Ts, Te>(this string s, Ts? Start, Te? End, SliceReturn SliceReturnSourceIfNotFound = SliceReturn.Never, SliceReturn DefaultValueIfNotFound = SliceReturn.Never, bool LastStart = false, bool LastEnd = true, bool IncludeStart = false, bool IncludeEnd = false, bool throwException = false) 
 			{
 				if (s.IsNullOrEmpty()) return throwException ? throw new ArgumentNullException(nameof(s)) : null;
@@ -1208,77 +1219,7 @@ namespace Titanium {
 				Left
 			}
 
-			/// <summary>
-			/// Return an index of (<paramref name="IndexOfEnd"/>? end : start) of <paramref name="s2"/> in <paramref name="s"/>
-			/// </summary>
-			/// <param name="s">Source string</param>
-			/// <param name="Conditions"> Conditions that should be met by the symbols of <paramref name="s"/> to be counted as <paramref name="searched_string"/> </param>
-			/// <param name="Start"> Start checking from (default: 0)</param>
-			/// <param name="End"> End checking at (default: end of s)</param>
-			/// <param name="InvertDirection"> if true, search from end to start</param>
-			/// <param name="IndexOfEnd"> Return index of end of s2 (next symbol to s2) instead of start (first letter)</param>
-			/// <returns></returns>
-			/// <exception cref="ArgumentOutOfRangeException"></exception>
-			public static int IndexOfT(this string s, Func<char,bool>[] Conditions, int Start = 0, int End = Int32.MaxValue, bool InvertDirection = false, bool IndexOfEnd = false) //: 26.11.23 Replaced RightDirection with opposite bool "InvertDirection"
-			{
-				if (End == Int32.MaxValue) End = s.Length-1;
-				if (Start < 0) Start = s.Length + Start;
-				if (Start < 0) new ArgumentOutOfRangeException(nameof(Start),Start,$"incorrect negative Start ({Start - s.Length}). |Start| should be ≤ s.Length ({s.Length})");
-				if (End < 0) End = s.Length + End;
-				if (End < 0) throw new ArgumentOutOfRangeException(nameof(End),End,$"incorrect negative End ({End - s.Length}). |End| should be ≤ s.Length ({s.Length})");
-
-				if (End == Start) return -2;
-
-				if(!InvertDirection && End < Start ||
-				   InvertDirection && End > Start)
-					Swap(ref Start, ref End);
-				
-				int defaultCurMatchPos = InvertDirection? Conditions.Length-1 : 0;
-				int curCondition = defaultCurMatchPos;
-				int Result = -1;
-
-				if (InvertDirection)
-					for (int i = Start; i >= End; i--)
-					{
-						if (Conditions[curCondition](s[i]))
-						{
-							curCondition--;
-							if (curCondition != 0) continue;
-							Result = i;
-							curCondition = defaultCurMatchPos;
-							//if(!LastOccuarance) 
-							break;
-						}
-						else
-						{
-							i += ((Conditions.Length - 1) - curCondition);
-							curCondition = defaultCurMatchPos;
-						}
-					}
-				else
-					for (int i = Start; i < End; i++)
-					{
-						if (Conditions[curCondition](s[i]))
-						{
-							curCondition++;
-							if (curCondition != Conditions.Length) continue;
-							Result = i;
-							curCondition = defaultCurMatchPos;
-							//if(!LastOccuarance)
-							break;
-						}
-						else
-						{
-							i -= curCondition;
-							curCondition = defaultCurMatchPos;
-						}
-					}
-
-				return Result = (Result == -1 || IndexOfEnd ^ InvertDirection)?
-					Result : (Result - Conditions.Length) +1;
-			}
-
-			/// <summary>
+				/// <summary>
 			/// Return an index of (<paramref name="IndexOfEnd"/>? end : start) of <paramref name="s2"/> in <paramref name="s"/>
 			/// </summary>
 			/// <param name="s"></param>
@@ -1349,24 +1290,94 @@ namespace Titanium {
 					Result : (Result - s2.Length) +1;
 			}
 
-
-			public static string Multiply(this string s, int count)
+			/// <summary>
+			/// Return an index of (<paramref name="IndexOfEnd"/>? end : start) of <paramref name="s2"/> in <paramref name="s"/>
+			/// </summary>
+			/// <param name="s">Source string</param>
+			/// <param name="Conditions"> Conditions that should be met by the symbols of <paramref name="s"/> to be counted as <paramref name="searched_string"/> </param>
+			/// <param name="Start"> Start checking from (default: 0)</param>
+			/// <param name="End"> End checking at (default: end of s)</param>
+			/// <param name="InvertDirection"> if true, search from end to start</param>
+			/// <param name="IndexOfEnd"> Return index of end of s2 (next symbol to s2) instead of start (first letter)</param>
+			/// <returns></returns>
+			/// <exception cref="ArgumentOutOfRangeException"></exception>
+			public static int IndexOfT(this string s, Func<char,bool>[] Conditions, int Start = 0, int End = Int32.MaxValue, bool InvertDirection = false, bool IndexOfEnd = false) //: 26.11.23 Replaced RightDirection with opposite bool "InvertDirection"
 			{
-				StringBuilder sb = new StringBuilder(s.Length*count);
+				if (End == Int32.MaxValue) End = s.Length-1;
+				if (Start < 0) Start = s.Length + Start;
+				if (Start < 0) new ArgumentOutOfRangeException(nameof(Start),Start,$"incorrect negative Start ({Start - s.Length}). |Start| should be ≤ s.Length ({s.Length})");
+				if (End < 0) End = s.Length + End;
+				if (End < 0) throw new ArgumentOutOfRangeException(nameof(End),End,$"incorrect negative End ({End - s.Length}). |End| should be ≤ s.Length ({s.Length})");
+
+				if (End == Start) return -2;
+
+				if(!InvertDirection && End < Start ||
+				   InvertDirection && End > Start)
+					Swap(ref Start, ref End);
+				
+				int defaultCurMatchPos = InvertDirection? Conditions.Length-1 : 0;
+				int curCondition = defaultCurMatchPos;
+				int Result = -1;
+
+				if (InvertDirection)
+					for (int i = Start; i >= End; i--)
+					{
+						if (Conditions[curCondition](s[i]))
+						{
+							curCondition--;
+							if (curCondition != 0) continue;
+							Result = i;
+							curCondition = defaultCurMatchPos;
+							//if(!LastOccuarance) 
+							break;
+						}
+						else
+						{
+							i += ((Conditions.Length - 1) - curCondition);
+							curCondition = defaultCurMatchPos;
+						}
+					}
+				else
+					for (int i = Start; i < End; i++)
+					{
+						if (Conditions[curCondition](s[i]))
+						{
+							curCondition++;
+							if (curCondition != Conditions.Length) continue;
+							Result = i;
+							curCondition = defaultCurMatchPos;
+							//if(!LastOccuarance)
+							break;
+						}
+						else
+						{
+							i -= curCondition;
+							curCondition = defaultCurMatchPos;
+						}
+					}
+
+				return Result = (Result == -1 || IndexOfEnd ^ InvertDirection)?
+					Result : (Result - Conditions.Length) +1;
+			}
+
+
+			public static string Multiply(this string str, int count)
+			{
+				StringBuilder sb = new StringBuilder(str.Length*count);
 				for (int i = 0; i < count; i++)
 				{
-					sb.Append(s);
+					sb.Append(str);
 				}
 
 				return sb.ToString();
 			}
 
-			public static string Multiply(this char s, int count)
+			public static string Multiply(this char ch, int count)
 			{
 				StringBuilder sb = new StringBuilder(count);
 				for (int i = 0; i < count; i++)
 				{
-					sb.Append(s);
+					sb.Append(ch);
 				}
 
 				return sb.ToString();
@@ -1420,7 +1431,15 @@ namespace Titanium {
 
 			public static string Replace(this string s, IEnumerable<string> OldStrings, IEnumerable<string> NewStrings)
 			{
-				throw new NotImplementedException();
+				var oldStrings = OldStrings.ToArray();
+				var newStrings = NewStrings.ToArray();
+				if (oldStrings.Length != newStrings.Length) throw new ArgumentException("OldStrings and NewStrings should have the same length");
+				for (int i = 0; i < oldStrings.Length; i++)
+				{
+					s = s.Replace(oldStrings[i], newStrings[i]);
+				}
+
+				return s;
 			}
 
 			/// <summary>
@@ -1497,12 +1516,86 @@ namespace Titanium {
 				return s+addiction;
 			}
 
+			/// <summary>
+			/// Removes (<paramref name="FromLeft"/>? first : last) occurance of <paramref name="RemovableString"/>
+			/// </summary>
+			/// <param name="S"></param>
+			/// <param name="RemovableString"></param>
+			/// <param name="FromLeft"></param>
+			/// <param name="ComparisonType"></param>
+			/// <returns></returns>
+			public static string Remove(this string S, string RemovableString, bool FromLeft = true, StringComparison ComparisonType = StringComparison.Ordinal)
+			{
+				if (RemovableString is null or "") return S;
+				int startPos = FromLeft? S.IndexOf(RemovableString) : S.LastIndexOf(RemovableString);
+				return startPos == -1 ? S : S.Remove(startPos, RemovableString.Length);
+			}
 
-			#endregion
+			public static string RemoveFrom(this string Source, TypesFuncs.Side FromWhere = Side.End, params string[] RemovableStrings)
+			{
+				foreach (var rem in RemovableStrings) 
+					Source = Source.RemoveFrom(FromWhere, rem);
+				return Source;
+			}
 
-			#region Double
+			public static string RemoveFrom(this string Source, Side FromWhere, string RemovableString)
+			{
+				if (FromWhere!= Side.End && Source.StartsWith(RemovableString)) Source = Source.Slice(RemovableString.Length);
+				if (FromWhere!= Side.Start && Source.EndsWith(RemovableString)) Source = Source.Slice(0, -RemovableString.Length);
+				return Source;
+			}
 
-			public static bool isEven(this int number) => number % 2 == 0;
+			public static string RemoveAll(this string S, string RemovableString, StringComparison ComparisonType = StringComparison.Ordinal)
+			{
+				if (RemovableString is null or "") return S;
+
+				while (true)
+				{
+					int startPos = S.IndexOf(RemovableString,ComparisonType);
+					if (startPos == -1) return S;
+
+					S = S.Remove(startPos, RemovableString.Length);
+				} 
+			}
+
+			public static string RemoveAll(this string S, string[] RemovableStrings, StringComparison ComparisonType = StringComparison.Ordinal)
+			{
+				foreach (var s in RemovableStrings)
+				{
+					S = S.RemoveAll(s, ComparisonType);
+				}
+
+				return S;
+			}
+
+			public enum Side
+			{
+				Start,
+				End,
+				Both
+			}
+
+			public static string RemoveAllFrom(this string S, string RemovableChars, Side FromWhere = Side.Both, StringComparison ComparisonType = StringComparison.Ordinal)
+			{
+				int start = 0, end = 0;
+
+				if (FromWhere != Side.End)
+					foreach (var C in S)
+					{
+						if (RemovableChars.Contains(C)) start++;
+						else break;
+					}
+
+				if (FromWhere != Side.Start)
+					for (int i = S.Length -1; i >=0; i--)
+					{
+						if (RemovableChars.Contains(S[i])) end++;
+						else break;
+					}
+
+				return S[start..^end];
+			}
+
 
 			#endregion
 
@@ -1721,86 +1814,6 @@ namespace Titanium {
 				return list;
 			}
 
-			/// <summary>
-			/// Removes (<paramref name="FromLeft"/>? first : last) occurance of <paramref name="RemovableString"/>
-			/// </summary>
-			/// <param name="S"></param>
-			/// <param name="RemovableString"></param>
-			/// <param name="FromLeft"></param>
-			/// <param name="ComparisonType"></param>
-			/// <returns></returns>
-			public static string Remove(this string S, string RemovableString, bool FromLeft = true, StringComparison ComparisonType = StringComparison.Ordinal)
-			{
-				if (RemovableString is null or "") return S;
-				int startPos = FromLeft? S.IndexOf(RemovableString) : S.LastIndexOf(RemovableString);
-				return startPos == -1 ? S : S.Remove(startPos, RemovableString.Length);
-			}
-
-			public static string RemoveFrom(this string Source, TypesFuncs.Side FromWhere = Side.End, params string[] RemovableStrings)
-			{
-				foreach (var rem in RemovableStrings) 
-					Source = Source.RemoveFrom(FromWhere, rem);
-				return Source;
-			}
-
-			public static string RemoveFrom(this string Source, Side FromWhere, string RemovableString)
-			{
-				if (FromWhere!= Side.End && Source.StartsWith(RemovableString)) Source = Source.Slice(RemovableString.Length);
-				if (FromWhere!= Side.Start && Source.EndsWith(RemovableString)) Source = Source.Slice(0, -RemovableString.Length);
-				return Source;
-			}
-
-			public static string RemoveAll(this string S, string RemovableString, StringComparison ComparisonType = StringComparison.Ordinal)
-			{
-				if (RemovableString is null or "") return S;
-
-				while (true)
-				{
-					int startPos = S.IndexOf(RemovableString,ComparisonType);
-					if (startPos == -1) return S;
-
-					S = S.Remove(startPos, RemovableString.Length);
-				} 
-			}
-
-			public static string RemoveAll(this string S, string[] RemovableStrings, StringComparison ComparisonType = StringComparison.Ordinal)
-			{
-				foreach (var s in RemovableStrings)
-				{
-					S = S.RemoveAll(s, ComparisonType);
-				}
-
-				return S;
-			}
-
-			public enum Side
-			{
-				Start,
-				End,
-				Both
-			}
-
-			public static string RemoveAllFrom(this string S, string RemovableChars, Side FromWhere = Side.Both, StringComparison ComparisonType = StringComparison.Ordinal)
-			{
-				int start = 0, end = 0;
-
-				if (FromWhere != Side.End)
-					foreach (var C in S)
-					{
-						if (RemovableChars.Contains(C)) start++;
-						else break;
-					}
-
-				if (FromWhere != Side.Start)
-					for (int i = S.Length -1; i >=0; i--)
-					{
-						if (RemovableChars.Contains(S[i])) end++;
-						else break;
-					}
-
-				return S[start..^end];
-			}
-
 			public static bool AllEquals<T>(this IEnumerable<T> array) => array.All(x => Equals(array.First(), x));
 
 			public static string Enumerate(this IEnumerable<string> strings, string Separator = ", ", string LastSeparator = " and ") //: [19.11.2023] new
@@ -1864,6 +1877,12 @@ namespace Titanium {
 			/// <returns></returns>
 			public static bool IsMatchAny(this IEnumerable<Regex> r, string s, int start = 0) => s != null && r.Any(x => x.IsMatch(s));
 			public static bool IsMatchAll(this IEnumerable<Regex> r, string s, int start = 0) => s != null && r.All(x => x.IsMatch(s));
+			
+			/// <summary>
+			/// Swithes between "includes" and "excludes" modes
+			/// </summary>
+			/// <param name="r">The regular expression to modify.</param>
+			/// <returns>The modified regular expression.</returns>
 			public static Regex Reverse(this Regex r)
 			{
 				var regStr = r.ToString();
@@ -1911,8 +1930,10 @@ namespace Titanium {
 			#region Color
 
 			static Color Change(this Color c, byte? A = null, byte? R = null, byte? G = null, byte? B = null) => Color.FromArgb(A?? c.A, R??c.R, G??c.G, B??c.B);
+
+			#endregion
 			
-			#region Universal Type
+			#region Generic Type
 
 			public static void Swap<T>(ref T a, ref T b)
 			{
@@ -1933,10 +1954,16 @@ namespace Titanium {
 
 			#endregion
 
-			#endregion
-
 			#region Process
 
+			/// <summary>
+			/// Kills all processes with the same name or path
+			/// </summary>
+			/// <param name="Path">Path to the process</param>
+			/// <param name="Name">Name of the process</param>
+			/// <exception cref="Exception">Error while gathering processes</exception>
+			/// <exception cref="InvalidOperationException">Can't kill process. Is inside AggregateException</exception>
+			/// <exception cref="AggregateException">Collection of failed attempts to kill processes (one pre process)</exception>
 			public static void KillProcesses(string? Path = null, string? Name = null)
 			{
 				List<Process> processes;
@@ -2030,6 +2057,12 @@ namespace Titanium {
 
 			if (ErrorList.Count > 0) throw new AggregateException("Unable to copy files" ,ErrorList);
 		}
+
+		public static void CopyAllTo(this DirectoryInfo di, string TargetPath, bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false)
+		{
+			CopyAll(di.FullName, TargetPath, KillRelatedProcesses, ExceptList, DisableSyntaxCheck);
+		}
+		
 		/// <summary>
 		/// Removes all files and directories in the folder
 		/// </summary>
@@ -2085,11 +2118,6 @@ namespace Titanium {
 				var fileName = fileInfo.Name;
 				File.Move(file,Path.Combine(path, Rename(fileName)));	
 			}
-		}
-
-		public static void CopyAllTo(this DirectoryInfo di, string TargetPath, bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false)
-		{
-			CopyAll(di.FullName, TargetPath, KillRelatedProcesses, ExceptList, DisableSyntaxCheck);
 		}
 
 		public static void MoveAllTo(string SourcePath, string TargetPath, bool DeleteSourceDir = true,  bool KillRelatedProcesses = false, List<Regex> ExceptList = null, bool DisableSyntaxCheck = false) 
