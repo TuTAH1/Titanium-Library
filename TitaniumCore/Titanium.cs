@@ -20,7 +20,6 @@ namespace DoNotUse
 	/// </summary>
 	static class History
 	{
-
 		private const bool oldHistory = false;
 	}
 }
@@ -1055,12 +1054,7 @@ namespace Titanium {
 				int start = 0; //: slice cursor start position
 				int end = int.MaxValue; //: slice cursor end position
 				bool basicSlice = Start is int or null && End is int or null; //: detects if input is basic slice (start and end are ints)
-				if (basicSlice)
-				{
-					start = 
-					return s.Substring((Start?? 0), ((End?? s.Length) - (Start?? 0)))
-				}
-
+				
 				switch (Start)
 				{
 					case null: //: default value (don't slice start)
@@ -1096,15 +1090,18 @@ namespace Titanium {
 						throw new TypeInitializationException(typeof(Ts).FullName, new ArgumentException($"Type of {nameof(Start)} is not supported"));
 				}
 
-				if (start < 0)
-					if(DefaultValueIfNotFound is SliceReturn.Never or SliceReturn.End)
-						return //: if start not found
-							SliceReturnSourceIfNotFound is SliceReturn.Always or SliceReturn.Start ? s : //: return source if SliceReturnSourceIfNotFound is Always or Start
-							throwException ? throw new ArgumentOutOfRangeException(nameof(Start), start, "Start not found") : null; //: throw exception if throwException is true ELSE return null
-					else
-						start = 0; //: if start not found and DefaultValueIfNotFound is Always or Start, set start to 0
+				if (!basicSlice) //: don't do pre-slice if it's a basic slice
+				{
+					if (start < 0)
+						if (DefaultValueIfNotFound is SliceReturn.Never or SliceReturn.End)
+							return //: if start not found
+								SliceReturnSourceIfNotFound is SliceReturn.Always or SliceReturn.Start ? s : //: return source if SliceReturnSourceIfNotFound is Always or Start
+								throwException ? throw new ArgumentOutOfRangeException(nameof(Start), start, "Start not found") : null; //: throw exception if throwException is true ELSE return null
+						else
+							start = 0; //: if start not found and DefaultValueIfNotFound is Always or Start, set start to 0
 
-				s = s.Slice(start);
+					s = s.Slice(start); //: Slice source string to start (to prevent finding end before the start)
+				}
 
 				switch (End)
 				{
@@ -1142,6 +1139,8 @@ namespace Titanium {
 						throw new TypeInitializationException(typeof(Te).FullName, new ArgumentException($"Type of {nameof(End)} is not supported"));
 				}
 
+				if (basicSlice) return s.Substring(((int)start), ((end) - (start)));
+
 				if (end < 0)
 					if (SliceReturnSourceIfNotFound is SliceReturn.Always or SliceReturn.End)
 						return s;
@@ -1172,8 +1171,9 @@ namespace Titanium {
 		
 			/// <returns></returns>
 			/// <exception cref=""></exception>
-			public static string Slice<Ts>(this string s, Ts? Start, SliceReturn SliceReturnSourceIfNotFound = SliceReturn.Never, bool LastStart = false, bool LastEnd = true, bool IncludeStart = false, bool IncludeEnd = false) 
-				=> s.Slice(Start, null as string, SliceReturnSourceIfNotFound, LastStart, LastEnd, IncludeStart, IncludeEnd);
+			public static string? Slice<Ts>(this string s, Ts? Start, SliceReturn SliceReturnSourceIfNotFound = SliceReturn.Never, SliceReturn DefaultValueIfNotFound = SliceReturn.Never, bool LastStart = false, bool IncludeStart = false, bool IncludeEnd = false, bool throwException = false)
+				=> s.Slice(Start, null as string, SliceReturnSourceIfNotFound, DefaultValueIfNotFound, LastStart, true, IncludeStart, IncludeEnd, throwException);
+
 
 			public static string SliceFromEnd(this string s, string StartsWith = null, string EndsWith = null, bool AlwaysReturnString = false, bool LastStart = false, bool LastEnd = true, bool IncludeStart = false, bool IncludeEnd = false) //:25.08.2022 includeStart, includeEnd
 			{

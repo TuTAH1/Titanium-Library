@@ -7,7 +7,6 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 using Image = System.Drawing.Image;
-using TaskDialogButton = Ookii.Dialogs.WinForms.TaskDialogButton;
 
 namespace Titanium
 {
